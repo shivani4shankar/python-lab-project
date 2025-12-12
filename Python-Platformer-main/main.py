@@ -13,9 +13,6 @@ PLAYER_VEL = 5
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 
-# ---------------------------------------------------
-# BASIC UTILITY FUNCTIONS
-# ---------------------------------------------------
 def flip(sprites):
     return [pygame.transform.flip(sprite, True, False) for sprite in sprites]
 
@@ -56,9 +53,6 @@ def get_block(size):
     return pygame.transform.scale2x(surf)
 
 
-# ---------------------------------------------------
-# STRONG TRANSPARENCY FIX
-# ---------------------------------------------------
 def remove_white_background(img):
     img = img.convert_alpha()
     w, h = img.get_size()
@@ -72,9 +66,7 @@ def remove_white_background(img):
     return img
 
 
-# ---------------------------------------------------
-# PLAYER CLASS
-# ---------------------------------------------------
+
 class Player(pygame.sprite.Sprite):
     GRAVITY = 1
     SPRITES = load_sprites_sheets("MainCharacters", "PinkMan", 32, 32, True)
@@ -167,9 +159,7 @@ class Player(pygame.sprite.Sprite):
         win.blit(self.sprite, (self.rect.x - offset, self.rect.y))
 
 
-# ---------------------------------------------------
-# BLOCK / FIRE / COIN
-# ---------------------------------------------------
+
 class Object(pygame.sprite.Sprite):
     def __init__(self, x, y, w, h, name=None):
         super().__init__()
@@ -231,9 +221,6 @@ class Coin:
         return False
 
 
-# ---------------------------------------------------
-# BACKGROUND + DRAW
-# ---------------------------------------------------
 def get_background(name):
     img = pygame.image.load(join("assets", "Background", name))
     w, h = img.get_size()
@@ -251,9 +238,6 @@ def draw(win, bg, bg_img, player, objects, offset):
     player.draw(win, offset)
 
 
-# ---------------------------------------------------
-# UI DRAWING
-# ---------------------------------------------------
 HEART_IMG = remove_white_background(pygame.image.load(join("assets", "heart.png")))
 TROPHY_IMG = pygame.image.load(join("assets", "end(idle).png")).convert_alpha()
 
@@ -284,9 +268,6 @@ def draw_game_over(win):
     win.blit(t2, (WIDTH // 2 - t2.get_width() // 2, HEIGHT // 2 + 10))
 
 
-# ---------------------------------------------------
-# COLLISION HELPERS
-# ---------------------------------------------------
 def handle_vertical(player, objs, dy):
     hits = []
 
@@ -332,9 +313,6 @@ def handle_move(player, objs):
     handle_vertical(player, objs, player.y_vel)
 
 
-# ---------------------------------------------------
-# MAIN GAME LOOP
-# ---------------------------------------------------
 def main(window):
     global LIVES, GAME_OVER, SCORE
 
@@ -377,9 +355,7 @@ def main(window):
     while running:
         clock.tick(FPS)
 
-        #
-        # EVENTS
-        #
+
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
@@ -401,9 +377,6 @@ def main(window):
                     for c in coins:
                         c.collected = False
 
-        #
-        # GAME OVER SCREEN
-        #
         if GAME_OVER:
             draw(window, bg, bg_img, player, objects, offset)
             for c in coins:
@@ -431,12 +404,8 @@ def main(window):
         player.update()
 
 
-        # ---------------------------------------------------
-        # FIRE COLLISION — **IMPROVED HITBOX VERSION**
-        # ---------------------------------------------------
-
         player_hitbox = pygame.Rect(
-            player.rect.x + 2,         # wider hitbox (detects side collisions)
+            player.rect.x + 2,        
             player.rect.y + 5,
             player.rect.width - 4,
             player.rect.height - 10
@@ -463,16 +432,11 @@ def main(window):
                             player.y_vel = 0
 
 
-        #
-        # COINS
-        #
         for c in coins:
             if c.check_collect(player):
                 SCORE += 10
 
-        #
-        # FALL OFF SCREEN
-        #
+        
         if player.rect.x < offset - 300 or player.rect.x > offset + WIDTH + 300:
             LIVES -= 1
             if LIVES <= 0:
@@ -482,9 +446,7 @@ def main(window):
                 player.rect.y = 100
                 offset = 0
 
-        #
-        # DRAW EVERYTHING
-        #
+        
         draw(window, bg, bg_img, player, objects, offset)
 
         for c in coins:
@@ -496,9 +458,7 @@ def main(window):
         draw_lives(window, LIVES)
         draw_score(window, SCORE)
 
-        #
-        # WIN CONDITION
-        #
+        
         if player.rect.colliderect(trophy_rect):
             f = pygame.font.SysFont("arial", 42)
             t = f.render("YOU WIN!", True, (255, 255, 0))
@@ -507,9 +467,7 @@ def main(window):
             pygame.time.delay(1500)
             GAME_OVER = True
 
-        #
-        # CAMERA SCROLL
-        #
+        
         if ((player.rect.right - offset >= WIDTH - scroll and player.x_vel > 0)
             or (player.rect.left - offset <= scroll and player.x_vel < 0)):
             offset += player.x_vel
